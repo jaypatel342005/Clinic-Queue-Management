@@ -6,121 +6,121 @@ import { apiFetch } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Calendar, Clock } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
-function fmtDate(d: string) {
+function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-export default function AppointmentDetailPage() {
+export default function AppointmentDetails() {
   const { id } = useParams();
   const router = useRouter();
-  const [data, setData] = useState<any>(null);
+  const [appt, setAppt] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     apiFetch(`/appointments/${id}`)
-      .then(setData)
-      .catch((e: any) => toast.error(e.message))
+      .then(setAppt)
+      .catch((err: any) => toast.error(err.message))
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="flex h-48 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
-  if (!data) return <p className="text-muted-foreground">Appointment not found.</p>;
+  if (loading) {
+    return <div className="flex h-48 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
+  }
+  if (!appt) return <p className="text-muted-foreground">appointment not found.</p>;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={() => router.push("/patient")}>
           <ArrowLeft size={18} />
         </Button>
-        <h1 className="text-2xl font-semibold">Appointment Details</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Appointment Details</h1>
       </div>
 
-      {/* Overview */}
+      
       <Card>
         <CardContent className="grid gap-4 p-5 sm:grid-cols-4">
           <div>
             <p className="text-xs text-muted-foreground">Date</p>
-            <p className="flex items-center gap-1 text-sm font-medium"><Calendar size={14} /> {fmtDate(data.appointmentDate)}</p>
+            <p className="flex items-center gap-1 text-sm font-medium">{formatDate(appt.appointmentDate)}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Time</p>
-            <p className="flex items-center gap-1 text-sm font-medium"><Clock size={14} /> {data.timeSlot}</p>
+            <p className="flex items-center gap-1 text-sm font-medium">{appt.timeSlot}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Status</p>
-            <Badge variant="outline" className="mt-0.5">{data.status?.replace("_", " ")}</Badge>
+            <Badge variant="outline" className="mt-0.5">{appt.status?.replace("_", " ")}</Badge>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Queue Token</p>
-            <p className="text-lg font-bold text-primary">{data.queueEntry?.tokenNumber ?? "—"}</p>
+            <p className="text-lg font-bold text-primary">{appt.queueEntry?.tokenNumber ?? "—"}</p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Prescription */}
       <Card>
         <CardHeader><CardTitle className="text-base">Prescription</CardTitle></CardHeader>
         <CardContent>
-          {data.prescription ? (
+          {appt.prescription ? (
             <div className="space-y-3">
               <div className="overflow-x-auto rounded border">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50">
                     <tr>
-                      <th className="px-3 py-2 text-left font-medium">Medicine</th>
-                      <th className="px-3 py-2 text-left font-medium">Dosage</th>
-                      <th className="px-3 py-2 text-left font-medium">Duration</th>
+                      <th className="px-3 py-2 text-center font-medium">Medicine</th>
+                      <th className="px-3 py-2 text-center font-medium">Dosage</th>
+                      <th className="px-3 py-2 text-center font-medium">Duration</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {data.prescription.medicines?.map((m: any, i: number) => (
+                    {appt.prescription.medicines?.map((med: any, i: number) => (
                       <tr key={i} className="border-t">
-                        <td className="px-3 py-2">{m.name}</td>
-                        <td className="px-3 py-2">{m.dosage}</td>
-                        <td className="px-3 py-2">{m.duration}</td>
+                        <td className="px-3 py-2 text-center">{med.name}</td>
+                        <td className="px-3 py-2 text-center">{med.dosage}</td>
+                        <td className="px-3 py-2 text-center">{med.duration}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              {data.prescription.notes && (
-                <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Notes:</span> {data.prescription.notes}</p>
+              {appt.prescription.notes && (
+                <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Notes:</span> {appt.prescription.notes}</p>
               )}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No prescription added yet.</p>
+            <p className="text-sm text-muted-foreground">No prescription</p>
           )}
         </CardContent>
       </Card>
 
-      {/* Report */}
       <Card>
         <CardHeader><CardTitle className="text-base">Clinical Report</CardTitle></CardHeader>
         <CardContent>
-          {data.report ? (
-            <dl className="grid gap-3 sm:grid-cols-3 text-sm">
+          {appt.report ? (
+            <dl className="grid gap-3 text-sm sm:grid-cols-3">
               <div>
                 <dt className="text-xs text-muted-foreground">Diagnosis</dt>
-                <dd className="font-medium">{data.report.diagnosis}</dd>
+                <dd className="font-medium">{appt.report.diagnosis}</dd>
               </div>
-              {data.report.testRecommended && (
+              {appt.report.testRecommended && (
                 <div>
-                  <dt className="text-xs text-muted-foreground">Tests Recommended</dt>
-                  <dd>{data.report.testRecommended}</dd>
+                  <dt className="text-xs text-muted-foreground">Tests</dt>
+                  <dd>{appt.report.testRecommended}</dd>
                 </div>
               )}
-              {data.report.remarks && (
+              {appt.report.remarks && (
                 <div>
                   <dt className="text-xs text-muted-foreground">Remarks</dt>
-                  <dd>{data.report.remarks}</dd>
+                  <dd>{appt.report.remarks}</dd>
                 </div>
               )}
             </dl>
           ) : (
-            <p className="text-sm text-muted-foreground">No report added yet.</p>
+            <p className="text-sm text-muted-foreground">No report</p>
           )}
         </CardContent>
       </Card>

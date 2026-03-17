@@ -3,53 +3,59 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileText } from "lucide-react";
 import { toast } from "sonner";
 
-export default function MyReportsPage() {
+export default function MyReports() {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     apiFetch("/reports/my")
       .then(setReports)
-      .catch((e: any) => toast.error(e.message))
+      .catch((err: any) => toast.error(err.message))
       .finally(() => setLoading(false));
   }, []);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">My Reports</h1>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">My Reports</h1>
+        <p className="text-sm text-muted-foreground">clinical reports from your appointments.</p>
+      </div>
 
       {loading ? (
-        <div className="flex h-48 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        <div className="flex h-48 items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
       ) : reports.length === 0 ? (
-        <Card><CardContent className="py-12 text-center text-muted-foreground">No reports yet.</CardContent></Card>
+        <Card>
+          <CardContent className="py-16 text-center text-muted-foreground">
+            <FileText className="mx-auto mb-3 h-8 w-8 opacity-40" />
+            No reports found.
+          </CardContent>
+        </Card>
       ) : (
-        <div className="space-y-4">
-          {reports.map((r: any, idx: number) => (
-            <Card key={idx}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Appointment #{r.appointmentId}
-                </CardTitle>
-              </CardHeader>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {reports.map((rpt) => (
+            <Card key={rpt.id} className="transition-shadow hover:shadow-md">
+              <CardHeader className="pb-2"><CardTitle className="text-sm">Report #{rpt.id}</CardTitle></CardHeader>
               <CardContent>
-                <dl className="grid gap-3 sm:grid-cols-3 text-sm">
+                <dl className="grid gap-2 text-sm sm:grid-cols-3">
                   <div>
                     <dt className="text-xs text-muted-foreground">Diagnosis</dt>
-                    <dd className="font-medium">{r.diagnosis}</dd>
+                    <dd className="font-medium">{rpt.diagnosis}</dd>
                   </div>
-                  {r.testRecommended && (
+                  {rpt.testRecommended && (
                     <div>
                       <dt className="text-xs text-muted-foreground">Tests</dt>
-                      <dd>{r.testRecommended}</dd>
+                      <dd>{rpt.testRecommended}</dd>
                     </div>
                   )}
-                  {r.remarks && (
+                  {rpt.remarks && (
                     <div>
                       <dt className="text-xs text-muted-foreground">Remarks</dt>
-                      <dd>{r.remarks}</dd>
+                      <dd>{rpt.remarks}</dd>
                     </div>
                   )}
                 </dl>

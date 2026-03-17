@@ -1,22 +1,23 @@
-export const API_BASE_URL = "https://cmsback.sampaarsh.cloud";
 
+
+
+const BASE = "https://cmsback.sampaarsh.cloud";
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  const res = await fetch(`${BASE}${endpoint}`, { ...options, headers });
 
-  if (!response.ok) {
-    if (response.status === 401 && typeof window !== 'undefined') {
+  
+  if (!res.ok) {
+    if (res.status === 401 && typeof window !== 'undefined') {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       if (window.location.pathname !== '/login') {
@@ -24,25 +25,19 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
       }
     }
 
-    let errorMessage = `API Error: ${response.statusText}`;
+    
+    let msg = `Request failed: ${res.statusText}`;
     try {
-      const errorData = await response.json();
-      if (errorData.error) {
-        errorMessage = errorData.error;
-      } else if (errorData.message) {
-       
-        errorMessage = errorData.message;
-      }
-    } catch (e) {
+      const body = await res.json();
+      msg = body.error || body.message || msg;
+    } catch {
       
     }
-    throw new Error(errorMessage);
+    throw new Error(msg);
   }
 
   
-  if (response.status === 204) {
-    return null;
-  }
+  if (res.status === 204) return null;
 
-  return response.json();
+  return res.json();
 }

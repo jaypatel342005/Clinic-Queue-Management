@@ -8,7 +8,7 @@ export default function ReceptionistLayout({ children }: { children: React.React
     <ProtectedRoute allowedRoles={["receptionist"]}>
       <div className="flex min-h-screen">
         <AppSidebar />
-        <main className="ml-60 flex-1 bg-muted/30 p-6">{children}</main>
+        <main className="ml-64 flex-1 bg-muted/30 p-8">{children}</main>
       </div>
     </ProtectedRoute>
   );
