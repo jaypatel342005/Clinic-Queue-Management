@@ -15,7 +15,7 @@ import { Loader2, Plus } from "lucide-react";
 
 
 const badgeColors: Record<string, string> = {
-  admin: "bg-blue-50 text-blue-700 border-blue-200",
+  admin: "bg-primary/10 text-primary border-primary/20",
   doctor: "bg-emerald-50 text-emerald-700 border-emerald-200",
   receptionist: "bg-amber-50 text-amber-700 border-amber-200",
   patient: "bg-slate-50 text-slate-700 border-slate-200",

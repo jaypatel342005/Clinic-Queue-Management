@@ -136,7 +136,7 @@ function ConsultForm() {
           <form onSubmit={handleSaveRx}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Pill size={18} className="text-blue-500" /> Prescription
+                <Pill size={18} className="text-primary" /> Prescription
               </CardTitle>
 
               <br></br>

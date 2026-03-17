@@ -11,7 +11,7 @@ import { toast } from "sonner";
 
 
 const statusColors: Record<string, string> = {
-  scheduled: "bg-blue-50 text-blue-700 border-blue-200",
+  scheduled: "bg-primary/10 text-primary border-primary/20",
   queued: "bg-amber-50 text-amber-700 border-amber-200",
   in_progress: "bg-purple-50 text-purple-700 border-purple-200",
   done: "bg-emerald-50 text-emerald-700 border-emerald-200",
